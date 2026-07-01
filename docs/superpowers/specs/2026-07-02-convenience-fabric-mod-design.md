@@ -1,4 +1,4 @@
-# Convenience Fabric Mod Design
+﻿# KindMap Fabric Mod Design
 
 ## Goal
 
@@ -123,7 +123,7 @@ The UI should avoid status text overlays during gameplay. Settings labels can be
 
 Use one JSON config file:
 
-`config/convenience-tools.json`
+`config/kindmap.json`
 
 Example shape:
 
@@ -163,7 +163,7 @@ Config handling:
 
 Suggested package layout:
 
-- `client/ConvenienceToolsClient`: Fabric client entrypoint.
+- `client/KindMapClient`: Fabric client entrypoint.
 - `config/ModConfig`: serializable config model.
 - `config/ConfigManager`: load, validate, save.
 - `gamma/GammaController`: apply/toggle gamma and restore normal brightness.
@@ -209,3 +209,4 @@ Manual runtime checks:
 - Predefined fixed macro slots.
 - Chat/actionbar/toast status messages for gamma toggles.
 - Bypassing server permissions, chat signing, spam limits, or command cooldowns.
+

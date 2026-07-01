@@ -1,4 +1,4 @@
-# Convenience Fabric Mod Implementation Plan
+﻿# KindMap Fabric Mod Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -17,27 +17,27 @@
 - Create `gradle.properties`: version constants and JVM flags.
 - Create `.gitignore`: Gradle/build/run outputs.
 - Create `src/main/resources/fabric.mod.json`: client entrypoint and optional Mod Menu entrypoint.
-- Create `src/main/resources/assets/convenience_tools/lang/en_us.json`: user-facing labels.
-- Create `src/main/java/com/lama/conveniencetools/ConvenienceToolsClient.java`: Fabric client entrypoint.
-- Create `src/main/java/com/lama/conveniencetools/ModConstants.java`: shared mod id/name.
-- Create `src/main/java/com/lama/conveniencetools/config/ModConfig.java`: root config model.
-- Create `src/main/java/com/lama/conveniencetools/config/GammaConfig.java`: gamma config model.
-- Create `src/main/java/com/lama/conveniencetools/config/MacroConfig.java`: macro config model.
-- Create `src/main/java/com/lama/conveniencetools/config/ConfigManager.java`: JSON load/validate/save.
-- Create `src/main/java/com/lama/conveniencetools/gamma/BrightnessAccess.java`: testable brightness adapter.
-- Create `src/main/java/com/lama/conveniencetools/gamma/MinecraftBrightnessAccess.java`: Minecraft brightness implementation.
-- Create `src/main/java/com/lama/conveniencetools/gamma/GammaController.java`: gamma state machine.
-- Create `src/main/java/com/lama/conveniencetools/macro/MacroAction.java`: macro action enum.
-- Create `src/main/java/com/lama/conveniencetools/macro/MacroMode.java`: macro mode enum.
-- Create `src/main/java/com/lama/conveniencetools/macro/ChatExecutor.java`: testable chat/command adapter.
-- Create `src/main/java/com/lama/conveniencetools/macro/MinecraftChatExecutor.java`: Minecraft chat implementation.
-- Create `src/main/java/com/lama/conveniencetools/macro/MacroManager.java`: macro key matching and scheduling.
-- Create `src/main/java/com/lama/conveniencetools/ui/ModMenuIntegration.java`: Mod Menu config hook.
-- Create `src/main/java/com/lama/conveniencetools/ui/ConvenienceConfigScreen.java`: main settings screen.
-- Create `src/main/java/com/lama/conveniencetools/ui/MacroEditScreen.java`: macro add/edit screen.
-- Create `src/test/java/com/lama/conveniencetools/config/ConfigManagerTest.java`: config tests.
-- Create `src/test/java/com/lama/conveniencetools/gamma/GammaControllerTest.java`: gamma tests.
-- Create `src/test/java/com/lama/conveniencetools/macro/MacroManagerTest.java`: macro tests.
+- Create `src/main/resources/assets/kindmap/lang/en_us.json`: user-facing labels.
+- Create `src/main/java/com/younjaeh/kindmap/KindMapClient.java`: Fabric client entrypoint.
+- Create `src/main/java/com/younjaeh/kindmap/ModConstants.java`: shared mod id/name.
+- Create `src/main/java/com/younjaeh/kindmap/config/ModConfig.java`: root config model.
+- Create `src/main/java/com/younjaeh/kindmap/config/GammaConfig.java`: gamma config model.
+- Create `src/main/java/com/younjaeh/kindmap/config/MacroConfig.java`: macro config model.
+- Create `src/main/java/com/younjaeh/kindmap/config/ConfigManager.java`: JSON load/validate/save.
+- Create `src/main/java/com/younjaeh/kindmap/gamma/BrightnessAccess.java`: testable brightness adapter.
+- Create `src/main/java/com/younjaeh/kindmap/gamma/MinecraftBrightnessAccess.java`: Minecraft brightness implementation.
+- Create `src/main/java/com/younjaeh/kindmap/gamma/GammaController.java`: gamma state machine.
+- Create `src/main/java/com/younjaeh/kindmap/macro/MacroAction.java`: macro action enum.
+- Create `src/main/java/com/younjaeh/kindmap/macro/MacroMode.java`: macro mode enum.
+- Create `src/main/java/com/younjaeh/kindmap/macro/ChatExecutor.java`: testable chat/command adapter.
+- Create `src/main/java/com/younjaeh/kindmap/macro/MinecraftChatExecutor.java`: Minecraft chat implementation.
+- Create `src/main/java/com/younjaeh/kindmap/macro/MacroManager.java`: macro key matching and scheduling.
+- Create `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`: Mod Menu config hook.
+- Create `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`: main settings screen.
+- Create `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`: macro add/edit screen.
+- Create `src/test/java/com/younjaeh/kindmap/config/ConfigManagerTest.java`: config tests.
+- Create `src/test/java/com/younjaeh/kindmap/gamma/GammaControllerTest.java`: gamma tests.
+- Create `src/test/java/com/younjaeh/kindmap/macro/MacroManagerTest.java`: macro tests.
 
 ## Task 1: Bootstrap Fabric Project
 
@@ -47,7 +47,7 @@
 - Create: `gradle.properties`
 - Create: `.gitignore`
 - Create: `src/main/resources/fabric.mod.json`
-- Create: `src/main/resources/assets/convenience_tools/lang/en_us.json`
+- Create: `src/main/resources/assets/kindmap/lang/en_us.json`
 
 - [ ] **Step 1: Create Gradle settings**
 
@@ -76,7 +76,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = 'convenience-tools'
+rootProject.name = 'kindmap'
 ```
 
 - [ ] **Step 2: Create Gradle properties**
@@ -93,8 +93,8 @@ fabric_version=0.154.0+26.1.2
 loom_version=1.17.13
 
 mod_version=0.1.0
-maven_group=com.lama
-archives_base_name=convenience-tools
+maven_group=com.younjaeh
+archives_base_name=kindmap
 
 modmenu_version=18.0.0-beta.1
 cloth_config_version=26.1.154
@@ -128,7 +128,7 @@ loom {
     splitEnvironmentSourceSets()
 
     mods {
-        convenience_tools {
+        kindmap {
             sourceSet sourceSets.client
         }
     }
@@ -184,21 +184,21 @@ Create `src/main/resources/fabric.mod.json`:
 ```json
 {
   "schemaVersion": 1,
-  "id": "convenience_tools",
+  "id": "kindmap",
   "version": "${version}",
-  "name": "Convenience Tools",
+  "name": "KindMap",
   "description": "Client-side gamma and macro keybind tools.",
   "authors": ["lama0"],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/convenience_tools/icon.png",
+  "icon": "assets/kindmap/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
-      "com.lama.conveniencetools.ConvenienceToolsClient"
+      "com.younjaeh.kindmap.KindMapClient"
     ],
     "modmenu": [
-      "com.lama.conveniencetools.ui.ModMenuIntegration"
+      "com.younjaeh.kindmap.ui.ModMenuIntegration"
     ]
   },
   "depends": {
@@ -216,24 +216,24 @@ Create `src/main/resources/fabric.mod.json`:
 
 - [ ] **Step 6: Create language labels**
 
-Create `src/main/resources/assets/convenience_tools/lang/en_us.json`:
+Create `src/main/resources/assets/kindmap/lang/en_us.json`:
 
 ```json
 {
-  "key.categories.convenience_tools": "Convenience Tools",
-  "key.convenience_tools.toggle_gamma": "Toggle Gamma",
-  "text.convenience_tools.title": "Convenience Tools",
-  "text.convenience_tools.gamma": "Gamma",
-  "text.convenience_tools.macros": "Macros",
-  "text.convenience_tools.gamma.enabled": "Gamma Enabled",
-  "text.convenience_tools.gamma.enabled_value": "Enabled Gamma",
-  "text.convenience_tools.add_macro": "Add Macro",
-  "text.convenience_tools.edit_macro": "Edit Macro",
-  "text.convenience_tools.macro.name": "Name",
-  "text.convenience_tools.macro.key": "Key",
-  "text.convenience_tools.macro.content": "Content",
-  "text.convenience_tools.macro.action": "Action",
-  "text.convenience_tools.macro.mode": "Mode"
+  "key.categories.kindmap": "KindMap",
+  "key.kindmap.toggle_gamma": "Toggle Gamma",
+  "text.kindmap.title": "KindMap",
+  "text.kindmap.gamma": "Gamma",
+  "text.kindmap.macros": "Macros",
+  "text.kindmap.gamma.enabled": "Gamma Enabled",
+  "text.kindmap.gamma.enabled_value": "Enabled Gamma",
+  "text.kindmap.add_macro": "Add Macro",
+  "text.kindmap.edit_macro": "Edit Macro",
+  "text.kindmap.macro.name": "Name",
+  "text.kindmap.macro.key": "Key",
+  "text.kindmap.macro.content": "Content",
+  "text.kindmap.macro.action": "Action",
+  "text.kindmap.macro.mode": "Mode"
 }
 ```
 
@@ -275,19 +275,19 @@ Expected: commit succeeds.
 ## Task 2: Config Model And Persistence
 
 **Files:**
-- Create: `src/main/java/com/lama/conveniencetools/ModConstants.java`
-- Create: `src/main/java/com/lama/conveniencetools/config/GammaConfig.java`
-- Create: `src/main/java/com/lama/conveniencetools/config/MacroConfig.java`
-- Create: `src/main/java/com/lama/conveniencetools/config/ModConfig.java`
-- Create: `src/main/java/com/lama/conveniencetools/config/ConfigManager.java`
-- Create: `src/test/java/com/lama/conveniencetools/config/ConfigManagerTest.java`
+- Create: `src/main/java/com/younjaeh/kindmap/ModConstants.java`
+- Create: `src/main/java/com/younjaeh/kindmap/config/GammaConfig.java`
+- Create: `src/main/java/com/younjaeh/kindmap/config/MacroConfig.java`
+- Create: `src/main/java/com/younjaeh/kindmap/config/ModConfig.java`
+- Create: `src/main/java/com/younjaeh/kindmap/config/ConfigManager.java`
+- Create: `src/test/java/com/younjaeh/kindmap/config/ConfigManagerTest.java`
 
 - [ ] **Step 1: Write failing config tests**
 
-Create `src/test/java/com/lama/conveniencetools/config/ConfigManagerTest.java`:
+Create `src/test/java/com/younjaeh/kindmap/config/ConfigManagerTest.java`:
 
 ```java
-package com.lama.conveniencetools.config;
+package com.younjaeh.kindmap.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -303,19 +303,19 @@ final class ConfigManagerTest {
 
     @Test
     void createsDefaultsWhenFileIsMissing() throws Exception {
-        ConfigManager manager = new ConfigManager(tempDir.resolve("convenience-tools.json"));
+        ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
 
         ModConfig config = manager.load();
 
         assertFalse(config.gamma.enabled);
         assertEquals(1500.0, config.gamma.enabledValue);
         assertEquals("key.keyboard.g", config.gamma.toggleKey);
-        assertTrue(Files.exists(tempDir.resolve("convenience-tools.json")));
+        assertTrue(Files.exists(tempDir.resolve("kindmap.json")));
     }
 
     @Test
     void clampsInvalidGammaValues() throws Exception {
-        Path file = tempDir.resolve("convenience-tools.json");
+        Path file = tempDir.resolve("kindmap.json");
         Files.writeString(file, """
             {
               "gamma": {
@@ -341,7 +341,7 @@ final class ConfigManagerTest {
 
     @Test
     void savesUnicodeMacroContent() throws Exception {
-        ConfigManager manager = new ConfigManager(tempDir.resolve("convenience-tools.json"));
+        ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
         ModConfig config = ModConfig.defaults();
         MacroConfig macro = MacroConfig.defaults();
         macro.id = "ender";
@@ -363,22 +363,22 @@ final class ConfigManagerTest {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.config.ConfigManagerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.config.ConfigManagerTest --no-daemon
 ```
 
 Expected: FAIL because `ConfigManager`, `ModConfig`, `GammaConfig`, and `MacroConfig` do not exist.
 
 - [ ] **Step 3: Add shared constants**
 
-Create `src/main/java/com/lama/conveniencetools/ModConstants.java`:
+Create `src/main/java/com/younjaeh/kindmap/ModConstants.java`:
 
 ```java
-package com.lama.conveniencetools;
+package com.younjaeh.kindmap;
 
 public final class ModConstants {
-    public static final String MOD_ID = "convenience_tools";
-    public static final String MOD_NAME = "Convenience Tools";
-    public static final String CONFIG_FILE_NAME = "convenience-tools.json";
+    public static final String MOD_ID = "kindmap";
+    public static final String MOD_NAME = "KindMap";
+    public static final String CONFIG_FILE_NAME = "kindmap.json";
 
     private ModConstants() {
     }
@@ -387,10 +387,10 @@ public final class ModConstants {
 
 - [ ] **Step 4: Add config model classes**
 
-Create `src/main/java/com/lama/conveniencetools/config/GammaConfig.java`:
+Create `src/main/java/com/younjaeh/kindmap/config/GammaConfig.java`:
 
 ```java
-package com.lama.conveniencetools.config;
+package com.younjaeh.kindmap.config;
 
 public final class GammaConfig {
     public boolean enabled = false;
@@ -405,13 +405,13 @@ public final class GammaConfig {
 }
 ```
 
-Create `src/main/java/com/lama/conveniencetools/config/MacroConfig.java`:
+Create `src/main/java/com/younjaeh/kindmap/config/MacroConfig.java`:
 
 ```java
-package com.lama.conveniencetools.config;
+package com.younjaeh.kindmap.config;
 
-import com.lama.conveniencetools.macro.MacroAction;
-import com.lama.conveniencetools.macro.MacroMode;
+import com.younjaeh.kindmap.macro.MacroAction;
+import com.younjaeh.kindmap.macro.MacroMode;
 
 import java.util.UUID;
 
@@ -432,10 +432,10 @@ public final class MacroConfig {
 }
 ```
 
-Create `src/main/java/com/lama/conveniencetools/config/ModConfig.java`:
+Create `src/main/java/com/younjaeh/kindmap/config/ModConfig.java`:
 
 ```java
-package com.lama.conveniencetools.config;
+package com.younjaeh.kindmap.config;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -452,10 +452,10 @@ public final class ModConfig {
 
 - [ ] **Step 5: Add enum dependencies for config**
 
-Create `src/main/java/com/lama/conveniencetools/macro/MacroAction.java`:
+Create `src/main/java/com/younjaeh/kindmap/macro/MacroAction.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
 public enum MacroAction {
     SEND,
@@ -463,10 +463,10 @@ public enum MacroAction {
 }
 ```
 
-Create `src/main/java/com/lama/conveniencetools/macro/MacroMode.java`:
+Create `src/main/java/com/younjaeh/kindmap/macro/MacroMode.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
 public enum MacroMode {
     SIMPLE,
@@ -478,10 +478,10 @@ public enum MacroMode {
 
 - [ ] **Step 6: Implement config manager**
 
-Create `src/main/java/com/lama/conveniencetools/config/ConfigManager.java`:
+Create `src/main/java/com/younjaeh/kindmap/config/ConfigManager.java`:
 
 ```java
-package com.lama.conveniencetools.config;
+package com.younjaeh.kindmap.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -562,10 +562,10 @@ public final class ConfigManager {
             macro.content = "";
         }
         if (macro.action == null) {
-            macro.action = com.lama.conveniencetools.macro.MacroAction.SEND;
+            macro.action = com.younjaeh.kindmap.macro.MacroAction.SEND;
         }
         if (macro.mode == null) {
-            macro.mode = com.lama.conveniencetools.macro.MacroMode.SIMPLE;
+            macro.mode = com.younjaeh.kindmap.macro.MacroMode.SIMPLE;
         }
         if (macro.delayMs < 0L) {
             macro.delayMs = 0L;
@@ -582,7 +582,7 @@ public final class ConfigManager {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.config.ConfigManagerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.config.ConfigManagerTest --no-daemon
 ```
 
 Expected: PASS.
@@ -592,7 +592,7 @@ Expected: PASS.
 Run:
 
 ```powershell
-git add src/main/java/com/lama/conveniencetools src/test/java/com/lama/conveniencetools/config
+git add src/main/java/com/younjaeh/kindmap src/test/java/com/younjaeh/kindmap/config
 git commit -m "feat: add config persistence"
 ```
 
@@ -601,19 +601,19 @@ Expected: commit succeeds.
 ## Task 3: Gamma Controller
 
 **Files:**
-- Create: `src/main/java/com/lama/conveniencetools/gamma/BrightnessAccess.java`
-- Create: `src/main/java/com/lama/conveniencetools/gamma/GammaController.java`
-- Create: `src/main/java/com/lama/conveniencetools/gamma/MinecraftBrightnessAccess.java`
-- Create: `src/test/java/com/lama/conveniencetools/gamma/GammaControllerTest.java`
+- Create: `src/main/java/com/younjaeh/kindmap/gamma/BrightnessAccess.java`
+- Create: `src/main/java/com/younjaeh/kindmap/gamma/GammaController.java`
+- Create: `src/main/java/com/younjaeh/kindmap/gamma/MinecraftBrightnessAccess.java`
+- Create: `src/test/java/com/younjaeh/kindmap/gamma/GammaControllerTest.java`
 
 - [ ] **Step 1: Write failing gamma tests**
 
-Create `src/test/java/com/lama/conveniencetools/gamma/GammaControllerTest.java`:
+Create `src/test/java/com/younjaeh/kindmap/gamma/GammaControllerTest.java`:
 
 ```java
-package com.lama.conveniencetools.gamma;
+package com.younjaeh.kindmap.gamma;
 
-import com.lama.conveniencetools.config.GammaConfig;
+import com.younjaeh.kindmap.config.GammaConfig;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -689,17 +689,17 @@ final class GammaControllerTest {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.gamma.GammaControllerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.gamma.GammaControllerTest --no-daemon
 ```
 
 Expected: FAIL because gamma classes do not exist.
 
 - [ ] **Step 3: Implement brightness interface and controller**
 
-Create `src/main/java/com/lama/conveniencetools/gamma/BrightnessAccess.java`:
+Create `src/main/java/com/younjaeh/kindmap/gamma/BrightnessAccess.java`:
 
 ```java
-package com.lama.conveniencetools.gamma;
+package com.younjaeh.kindmap.gamma;
 
 public interface BrightnessAccess {
     double getBrightness();
@@ -708,12 +708,12 @@ public interface BrightnessAccess {
 }
 ```
 
-Create `src/main/java/com/lama/conveniencetools/gamma/GammaController.java`:
+Create `src/main/java/com/younjaeh/kindmap/gamma/GammaController.java`:
 
 ```java
-package com.lama.conveniencetools.gamma;
+package com.younjaeh.kindmap.gamma;
 
-import com.lama.conveniencetools.config.GammaConfig;
+import com.younjaeh.kindmap.config.GammaConfig;
 
 import java.util.Objects;
 
@@ -769,10 +769,10 @@ public final class GammaController {
 
 - [ ] **Step 4: Implement Minecraft brightness adapter**
 
-Create `src/main/java/com/lama/conveniencetools/gamma/MinecraftBrightnessAccess.java`:
+Create `src/main/java/com/younjaeh/kindmap/gamma/MinecraftBrightnessAccess.java`:
 
 ```java
-package com.lama.conveniencetools.gamma;
+package com.younjaeh.kindmap.gamma;
 
 import net.minecraft.client.Minecraft;
 
@@ -800,7 +800,7 @@ public final class MinecraftBrightnessAccess implements BrightnessAccess {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.gamma.GammaControllerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.gamma.GammaControllerTest --no-daemon
 ```
 
 Expected: PASS.
@@ -810,7 +810,7 @@ Expected: PASS.
 Run:
 
 ```powershell
-git add src/main/java/com/lama/conveniencetools/gamma src/test/java/com/lama/conveniencetools/gamma
+git add src/main/java/com/younjaeh/kindmap/gamma src/test/java/com/younjaeh/kindmap/gamma
 git commit -m "feat: add persistent gamma controller"
 ```
 
@@ -819,19 +819,19 @@ Expected: commit succeeds.
 ## Task 4: Macro Runtime
 
 **Files:**
-- Create: `src/main/java/com/lama/conveniencetools/macro/ChatExecutor.java`
-- Create: `src/main/java/com/lama/conveniencetools/macro/MacroManager.java`
-- Create: `src/main/java/com/lama/conveniencetools/macro/MinecraftChatExecutor.java`
-- Create: `src/test/java/com/lama/conveniencetools/macro/MacroManagerTest.java`
+- Create: `src/main/java/com/younjaeh/kindmap/macro/ChatExecutor.java`
+- Create: `src/main/java/com/younjaeh/kindmap/macro/MacroManager.java`
+- Create: `src/main/java/com/younjaeh/kindmap/macro/MinecraftChatExecutor.java`
+- Create: `src/test/java/com/younjaeh/kindmap/macro/MacroManagerTest.java`
 
 - [ ] **Step 1: Write failing macro tests**
 
-Create `src/test/java/com/lama/conveniencetools/macro/MacroManagerTest.java`:
+Create `src/test/java/com/younjaeh/kindmap/macro/MacroManagerTest.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
-import com.lama.conveniencetools.config.MacroConfig;
+import com.younjaeh.kindmap.config.MacroConfig;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -927,17 +927,17 @@ final class MacroManagerTest {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.macro.MacroManagerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.macro.MacroManagerTest --no-daemon
 ```
 
 Expected: FAIL because macro runtime classes do not exist.
 
 - [ ] **Step 3: Implement chat executor and manager**
 
-Create `src/main/java/com/lama/conveniencetools/macro/ChatExecutor.java`:
+Create `src/main/java/com/younjaeh/kindmap/macro/ChatExecutor.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
 public interface ChatExecutor {
     void send(String content);
@@ -946,12 +946,12 @@ public interface ChatExecutor {
 }
 ```
 
-Create `src/main/java/com/lama/conveniencetools/macro/MacroManager.java`:
+Create `src/main/java/com/younjaeh/kindmap/macro/MacroManager.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
-import com.lama.conveniencetools.config.MacroConfig;
+import com.younjaeh.kindmap.config.MacroConfig;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1059,10 +1059,10 @@ public final class MacroManager {
 
 - [ ] **Step 4: Implement Minecraft chat executor**
 
-Create `src/main/java/com/lama/conveniencetools/macro/MinecraftChatExecutor.java`:
+Create `src/main/java/com/younjaeh/kindmap/macro/MinecraftChatExecutor.java`:
 
 ```java
-package com.lama.conveniencetools.macro;
+package com.younjaeh.kindmap.macro;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
@@ -1098,7 +1098,7 @@ public final class MinecraftChatExecutor implements ChatExecutor {
 Run:
 
 ```powershell
-.\gradlew.bat test --tests com.lama.conveniencetools.macro.MacroManagerTest --no-daemon
+.\gradlew.bat test --tests com.younjaeh.kindmap.macro.MacroManagerTest --no-daemon
 ```
 
 Expected: PASS.
@@ -1108,7 +1108,7 @@ Expected: PASS.
 Run:
 
 ```powershell
-git add src/main/java/com/lama/conveniencetools/macro src/test/java/com/lama/conveniencetools/macro
+git add src/main/java/com/younjaeh/kindmap/macro src/test/java/com/younjaeh/kindmap/macro
 git commit -m "feat: add macro runtime"
 ```
 
@@ -1117,8 +1117,8 @@ Expected: commit succeeds.
 ## Task 5: Fabric Client Wiring
 
 **Files:**
-- Create: `src/main/java/com/lama/conveniencetools/ConvenienceToolsClient.java`
-- Modify: `src/main/java/com/lama/conveniencetools/macro/MacroManager.java`
+- Create: `src/main/java/com/younjaeh/kindmap/KindMapClient.java`
+- Modify: `src/main/java/com/younjaeh/kindmap/macro/MacroManager.java`
 
 - [ ] **Step 1: Add held-key support to MacroManager**
 
@@ -1145,18 +1145,18 @@ Expected: `SIMPLE`, `TYPE`, `SEND`, and `TOGGLE` tests still pass.
 
 - [ ] **Step 2: Create Fabric client entrypoint**
 
-Create `src/main/java/com/lama/conveniencetools/ConvenienceToolsClient.java`:
+Create `src/main/java/com/younjaeh/kindmap/KindMapClient.java`:
 
 ```java
-package com.lama.conveniencetools;
+package com.younjaeh.kindmap;
 
-import com.lama.conveniencetools.config.ConfigManager;
-import com.lama.conveniencetools.config.MacroConfig;
-import com.lama.conveniencetools.config.ModConfig;
-import com.lama.conveniencetools.gamma.GammaController;
-import com.lama.conveniencetools.gamma.MinecraftBrightnessAccess;
-import com.lama.conveniencetools.macro.MacroManager;
-import com.lama.conveniencetools.macro.MinecraftChatExecutor;
+import com.younjaeh.kindmap.config.ConfigManager;
+import com.younjaeh.kindmap.config.MacroConfig;
+import com.younjaeh.kindmap.config.ModConfig;
+import com.younjaeh.kindmap.gamma.GammaController;
+import com.younjaeh.kindmap.gamma.MinecraftBrightnessAccess;
+import com.younjaeh.kindmap.macro.MacroManager;
+import com.younjaeh.kindmap.macro.MinecraftChatExecutor;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -1174,8 +1174,8 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class ConvenienceToolsClient implements ClientModInitializer {
-    private static ConvenienceToolsClient instance;
+public final class KindMapClient implements ClientModInitializer {
+    private static KindMapClient instance;
 
     private ModConfig config;
     private ConfigManager configManager;
@@ -1184,7 +1184,7 @@ public final class ConvenienceToolsClient implements ClientModInitializer {
     private KeyMapping gammaKey;
     private final Set<String> pressedMacroKeys = new HashSet<>();
 
-    public static ConvenienceToolsClient instance() {
+    public static KindMapClient instance() {
         return instance;
     }
 
@@ -1213,9 +1213,9 @@ public final class ConvenienceToolsClient implements ClientModInitializer {
         }
 
         gammaKey = KeyBindingHelper.registerKeyBinding(new KeyMapping(
-            "key.convenience_tools.toggle_gamma",
+            "key.kindmap.toggle_gamma",
             GLFW.GLFW_KEY_G,
-            "key.categories.convenience_tools"
+            "key.categories.kindmap"
         ));
 
         gammaController = new GammaController(config.gamma, new MinecraftBrightnessAccess(client), this::saveConfig);
@@ -1301,7 +1301,7 @@ Expected: PASS.
 Run:
 
 ```powershell
-git add src/main/java/com/lama/conveniencetools
+git add src/main/java/com/younjaeh/kindmap
 git commit -m "feat: wire gamma and macros into fabric client"
 ```
 
@@ -1310,16 +1310,16 @@ Expected: commit succeeds.
 ## Task 6: Settings UI
 
 **Files:**
-- Create: `src/main/java/com/lama/conveniencetools/ui/ModMenuIntegration.java`
-- Create: `src/main/java/com/lama/conveniencetools/ui/ConvenienceConfigScreen.java`
-- Create: `src/main/java/com/lama/conveniencetools/ui/MacroEditScreen.java`
+- Create: `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`
+- Create: `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`
+- Create: `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`
 
 - [ ] **Step 1: Create Mod Menu entrypoint**
 
-Create `src/main/java/com/lama/conveniencetools/ui/ModMenuIntegration.java`:
+Create `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`:
 
 ```java
-package com.lama.conveniencetools.ui;
+package com.younjaeh.kindmap.ui;
 
 import com.terraformersmc.modmenu.api.ConfigScreenFactory;
 import com.terraformersmc.modmenu.api.ModMenuApi;
@@ -1327,52 +1327,52 @@ import com.terraformersmc.modmenu.api.ModMenuApi;
 public final class ModMenuIntegration implements ModMenuApi {
     @Override
     public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return ConvenienceConfigScreen::create;
+        return KindMapConfigScreen::create;
     }
 }
 ```
 
 - [ ] **Step 2: Create main config screen**
 
-Create `src/main/java/com/lama/conveniencetools/ui/ConvenienceConfigScreen.java`:
+Create `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`:
 
 ```java
-package com.lama.conveniencetools.ui;
+package com.younjaeh.kindmap.ui;
 
-import com.lama.conveniencetools.ConvenienceToolsClient;
-import com.lama.conveniencetools.config.ModConfig;
+import com.younjaeh.kindmap.KindMapClient;
+import com.younjaeh.kindmap.config.ModConfig;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public final class ConvenienceConfigScreen {
-    private ConvenienceConfigScreen() {
+public final class KindMapConfigScreen {
+    private KindMapConfigScreen() {
     }
 
     public static Screen create(Screen parent) {
-        ConvenienceToolsClient mod = ConvenienceToolsClient.instance();
+        KindMapClient mod = KindMapClient.instance();
         ModConfig config = mod.config();
         ConfigBuilder builder = ConfigBuilder.create()
             .setParentScreen(parent)
-            .setTitle(Component.translatable("text.convenience_tools.title"))
+            .setTitle(Component.translatable("text.kindmap.title"))
             .setSavingRunnable(mod::saveConfig);
 
         ConfigEntryBuilder entries = builder.entryBuilder();
-        ConfigCategory gamma = builder.getOrCreateCategory(Component.translatable("text.convenience_tools.gamma"));
-        gamma.addEntry(entries.startBooleanToggle(Component.translatable("text.convenience_tools.gamma.enabled"), config.gamma.enabled)
+        ConfigCategory gamma = builder.getOrCreateCategory(Component.translatable("text.kindmap.gamma"));
+        gamma.addEntry(entries.startBooleanToggle(Component.translatable("text.kindmap.gamma.enabled"), config.gamma.enabled)
             .setDefaultValue(false)
             .setSaveConsumer(value -> config.gamma.enabled = value)
             .build());
-        gamma.addEntry(entries.startDoubleField(Component.translatable("text.convenience_tools.gamma.enabled_value"), config.gamma.enabledValue)
+        gamma.addEntry(entries.startDoubleField(Component.translatable("text.kindmap.gamma.enabled_value"), config.gamma.enabledValue)
             .setDefaultValue(1500.0)
             .setMin(config.gamma.minValue)
             .setMax(config.gamma.maxValue)
             .setSaveConsumer(value -> config.gamma.enabledValue = value)
             .build());
 
-        ConfigCategory macros = builder.getOrCreateCategory(Component.translatable("text.convenience_tools.macros"));
+        ConfigCategory macros = builder.getOrCreateCategory(Component.translatable("text.kindmap.macros"));
         macros.addEntry(entries.startTextDescription(Component.literal("Use Add Macro to create key-bound commands or chat text.")).build());
 
         return builder.build();
@@ -1382,12 +1382,12 @@ public final class ConvenienceConfigScreen {
 
 - [ ] **Step 3: Create macro edit screen shell**
 
-Create `src/main/java/com/lama/conveniencetools/ui/MacroEditScreen.java`:
+Create `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`:
 
 ```java
-package com.lama.conveniencetools.ui;
+package com.younjaeh.kindmap.ui;
 
-import com.lama.conveniencetools.config.MacroConfig;
+import com.younjaeh.kindmap.config.MacroConfig;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -1396,7 +1396,7 @@ public final class MacroEditScreen extends Screen {
     private final MacroConfig macro;
 
     public MacroEditScreen(Screen parent, MacroConfig macro) {
-        super(Component.translatable("text.convenience_tools.edit_macro"));
+        super(Component.translatable("text.kindmap.edit_macro"));
         this.parent = parent;
         this.macro = macro;
     }
@@ -1442,7 +1442,7 @@ Expected: existing macros can be enabled/disabled from Mod Menu.
 Run:
 
 ```powershell
-git add src/main/java/com/lama/conveniencetools/ui src/main/resources
+git add src/main/java/com/younjaeh/kindmap/ui src/main/resources
 git commit -m "feat: add mod menu settings"
 ```
 
@@ -1478,7 +1478,7 @@ Expected: `BUILD SUCCESSFUL` and jar appears under `build/libs/`.
 Create `README.md`:
 
 ```markdown
-# Convenience Tools
+# KindMap
 
 Client-only Fabric mod for Minecraft Java 26.1.2.
 
@@ -1534,3 +1534,4 @@ Expected: commit succeeds.
 - Spec coverage: target environment, gamma persistence, default `G`, no night vision, no status messages, user-created macros, send/type choice, repeat/delay/toggle modes, JSON config, Mod Menu settings, and build verification are covered by tasks.
 - Placeholder scan: no incomplete-work markers are intentionally left in this plan.
 - Risk: Minecraft runtime behavior still needs manual verification in a 26.1.2 Fabric client because unit tests cover core config, gamma state, and macro scheduling rather than the live client UI.
+
