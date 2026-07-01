@@ -5,6 +5,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -51,6 +52,26 @@ final class ConfigManagerTest {
     }
 
     @Test
+    void defaultsMissingGammaFieldsInPartialJson() throws Exception {
+        Path file = tempDir.resolve("kindmap.json");
+        Files.writeString(file, """
+            {
+              "gamma": {},
+              "macros": []
+            }
+            """);
+        ConfigManager manager = new ConfigManager(file);
+
+        ModConfig config = manager.load();
+
+        assertFalse(config.gamma.enabled);
+        assertEquals(1500.0, config.gamma.enabledValue);
+        assertEquals("key.keyboard.g", config.gamma.toggleKey);
+        assertEquals(0.0, config.gamma.minValue);
+        assertEquals(1500.0, config.gamma.maxValue);
+    }
+
+    @Test
     void savesUnicodeMacroContent() throws Exception {
         ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
         ModConfig config = ModConfig.defaults();
@@ -72,6 +93,8 @@ final class ConfigManagerTest {
         MacroConfig macro = MacroConfig.defaults();
 
         assertTrue(macro.enabled);
+        assertFalse(macro.id.isBlank());
+        assertDoesNotThrow(() -> UUID.fromString(macro.id));
         assertEquals(long.class, MacroConfig.class.getField("delayMs").getType());
         assertEquals(long.class, MacroConfig.class.getField("intervalMs").getType());
         assertEquals(0L, macro.delayMs);
