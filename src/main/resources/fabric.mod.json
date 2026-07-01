@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "kindmap",
+  "version": "${version}",
+  "name": "KindMap",
+  "description": "Client-side gamma and macro keybind tools.",
+  "authors": ["lama0"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.younjaeh.kindmap.KindMapClient"
+    ],
+    "modmenu": [
+      "com.younjaeh.kindmap.ui.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.3",
+    "minecraft": "26.1.2",
+    "fabric-api": ">=0.154.0+26.1.2",
+    "java": ">=25"
+  },
+  "suggests": {
+    "modmenu": "*",
+    "cloth-config": "*"
+  }
+}
