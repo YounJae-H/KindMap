@@ -8,13 +8,19 @@ public final class GammaController {
     private final GammaConfig config;
     private final BrightnessAccess brightness;
     private final Runnable saveCallback;
+    private final GammaNotifier notifier;
     private double normalBrightness;
     private boolean normalBrightnessCaptured;
 
     public GammaController(GammaConfig config, BrightnessAccess brightness, Runnable saveCallback) {
+        this(config, brightness, saveCallback, GammaNotifier.NONE);
+    }
+
+    public GammaController(GammaConfig config, BrightnessAccess brightness, Runnable saveCallback, GammaNotifier notifier) {
         this.config = Objects.requireNonNull(config, "config");
         this.brightness = Objects.requireNonNull(brightness, "brightness");
         this.saveCallback = Objects.requireNonNull(saveCallback, "saveCallback");
+        this.notifier = Objects.requireNonNull(notifier, "notifier");
     }
 
     public void initialize() {
@@ -28,9 +34,13 @@ public final class GammaController {
         config.enabled = !config.enabled;
         if (config.enabled) {
             captureCurrentNormalBrightness();
-            applyEnabledBrightness();
+            double enabledPercent = sanitizeEnabledBrightness();
+            applyEnabledBrightness(enabledPercent);
+            notifier.showGammaPercent(toDisplayPercent(enabledPercent));
         } else {
+            double restoredBrightness = normalBrightnessCaptured ? normalBrightness : sanitizeNormalBrightness(config.normalValue);
             restoreNormalBrightness();
+            notifier.showGammaPercent(rawBrightnessToDisplayPercent(restoredBrightness));
         }
         saveCallback.run();
     }
@@ -82,7 +92,11 @@ public final class GammaController {
     }
 
     private void applyEnabledBrightness() {
-        brightness.setBrightness(sanitizeEnabledBrightness());
+        applyEnabledBrightness(sanitizeEnabledBrightness());
+    }
+
+    private void applyEnabledBrightness(double enabledPercent) {
+        brightness.setBrightness(enabledPercent / 100.0);
     }
 
     private double sanitizeEnabledBrightness() {
@@ -115,5 +129,13 @@ public final class GammaController {
             return 0.5;
         }
         return value;
+    }
+
+    private static int toDisplayPercent(double percent) {
+        return (int) Math.round(percent);
+    }
+
+    private static int rawBrightnessToDisplayPercent(double value) {
+        return toDisplayPercent(value * 100.0);
     }
 }

@@ -5,6 +5,7 @@ import com.younjaeh.kindmap.config.ConfigManager;
 import com.younjaeh.kindmap.config.ModConfig;
 import com.younjaeh.kindmap.gamma.GammaController;
 import com.younjaeh.kindmap.gamma.MinecraftBrightnessAccess;
+import com.younjaeh.kindmap.gamma.MinecraftGammaNotifier;
 import com.younjaeh.kindmap.macro.MacroKeySet;
 import com.younjaeh.kindmap.macro.MacroManager;
 import com.younjaeh.kindmap.macro.MinecraftChatExecutor;
@@ -47,7 +48,12 @@ public final class KindMapClient implements ClientModInitializer {
         Path configPath = FabricLoader.getInstance().getConfigDir().resolve(ModConstants.CONFIG_FILE_NAME);
         configManager = new ConfigManager(configPath);
         config = loadConfig();
-        gammaController = new GammaController(config.gamma, MinecraftBrightnessAccess.currentClient(), this::saveConfig);
+        gammaController = new GammaController(
+                config.gamma,
+                MinecraftBrightnessAccess.currentClient(),
+                this::saveConfig,
+                MinecraftGammaNotifier.currentClient()
+        );
         macroManager = new MacroManager(MinecraftChatExecutor.currentClient());
         reloadMacrosFromConfig();
 

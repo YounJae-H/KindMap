@@ -1,6 +1,8 @@
 package com.younjaeh.kindmap.gamma;
 
+import com.younjaeh.kindmap.mixin.OptionInstanceAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.OptionInstance;
 
 import java.util.Objects;
 
@@ -21,7 +23,14 @@ public final class MinecraftBrightnessAccess implements BrightnessAccess {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setBrightness(double value) {
-        client.options.gamma().set(value);
+        OptionInstance<Double> gamma = client.options.gamma();
+        if (value <= 1.0) {
+            gamma.set(value);
+            return;
+        }
+
+        ((OptionInstanceAccessor<Double>) (Object) gamma).kindmap$setValue(value);
     }
 }

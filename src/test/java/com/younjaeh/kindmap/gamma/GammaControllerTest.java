@@ -19,7 +19,7 @@ final class GammaControllerTest {
 
         controller.initialize();
 
-        assertEquals(1500.0, brightness.current);
+        assertEquals(15.0, brightness.current);
         assertEquals(0, saveCounter.count);
     }
 
@@ -34,7 +34,7 @@ final class GammaControllerTest {
         controller.toggle();
 
         assertTrue(config.enabled);
-        assertEquals(1500.0, brightness.current);
+        assertEquals(15.0, brightness.current);
         assertEquals(1, saveCounter.count);
     }
 
@@ -76,13 +76,34 @@ final class GammaControllerTest {
     void togglingOnStoresNormalBrightnessForFutureRestores() {
         GammaConfig config = GammaConfig.defaults();
         FakeBrightness brightness = new FakeBrightness(0.8);
+        RecordingNotifier notifier = new RecordingNotifier();
         GammaController controller = new GammaController(config, brightness, () -> {
-        });
+        }, notifier);
 
         controller.toggle();
 
         assertTrue(config.enabled);
         assertEquals(0.8, config.normalValue);
+        assertEquals(15.0, brightness.current);
+        assertEquals(1500, notifier.lastPercent);
+    }
+
+    @Test
+    void togglingOffShowsRestoredNormalBrightnessPercent() {
+        GammaConfig config = GammaConfig.defaults();
+        config.enabled = true;
+        config.normalValue = 0.8;
+        FakeBrightness brightness = new FakeBrightness(15.0);
+        RecordingNotifier notifier = new RecordingNotifier();
+        GammaController controller = new GammaController(config, brightness, () -> {
+        }, notifier);
+
+        controller.initialize();
+        controller.toggle();
+
+        assertFalse(config.enabled);
+        assertEquals(0.8, brightness.current);
+        assertEquals(80, notifier.lastPercent);
     }
 
     @Test
@@ -130,7 +151,7 @@ final class GammaControllerTest {
 
         controller.initialize();
 
-        assertEquals(100.0, brightness.current);
+        assertEquals(1.0, brightness.current);
     }
 
     @Test
@@ -146,7 +167,7 @@ final class GammaControllerTest {
 
         controller.initialize();
 
-        assertEquals(100.0, brightness.current);
+        assertEquals(1.0, brightness.current);
     }
 
     @Test
@@ -187,6 +208,15 @@ final class GammaControllerTest {
         @Override
         public void run() {
             count++;
+        }
+    }
+
+    private static final class RecordingNotifier implements GammaNotifier {
+        private int lastPercent = -1;
+
+        @Override
+        public void showGammaPercent(int percent) {
+            lastPercent = percent;
         }
     }
 }
