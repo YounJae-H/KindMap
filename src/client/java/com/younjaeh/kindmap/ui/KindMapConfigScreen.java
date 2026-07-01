@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.network.chat.Component;
+import org.lwjgl.glfw.GLFW;
 
 public final class KindMapConfigScreen extends Screen {
     private static final int FORM_WIDTH = 520;
@@ -102,6 +103,12 @@ public final class KindMapConfigScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         if (capturingKey) {
+            if (event.key() == GLFW.GLFW_KEY_ESCAPE) {
+                capturingKey = false;
+                refreshWidgets();
+                return true;
+            }
+
             InputConstants.Key key = InputConstants.getKey(event);
             MacroConfig macro = selectedMacro();
             if (macro != null && key != InputConstants.UNKNOWN) {
@@ -157,7 +164,7 @@ public final class KindMapConfigScreen extends Screen {
                 Component.translatable("text.kindmap.macro.delay_ms"), value -> macro.delayMs = parseMacroLong(value, macro.delayMs));
         addLabel(left + 216, y, 80, Component.translatable("text.kindmap.macro.interval_ms"));
         macroIntervalField = addEditBox(left + 304, y, 120, 20, Long.toString(macro.intervalMs),
-                Component.translatable("text.kindmap.macro.interval_ms"), value -> macro.intervalMs = parseMacroLong(value, macro.intervalMs));
+                Component.translatable("text.kindmap.macro.interval_ms"), value -> macro.intervalMs = parseMacroInterval(value, macro.intervalMs));
     }
 
     private void addLabel(int x, int y, int width, Component label) {
@@ -213,9 +220,10 @@ public final class KindMapConfigScreen extends Screen {
     private void saveAndClose() {
         commitCurrentFieldValues();
         if (client != null && client.config() != null) {
+            boolean gammaWasEnabled = client.config().gamma != null && client.config().gamma.enabled;
             KindMapConfigDraft.applyTo(client.config(), draft);
             client.saveConfig();
-            client.applyGammaFromConfig();
+            client.applyGammaFromConfig(gammaWasEnabled);
             client.reloadMacrosFromConfig();
         }
         closeWithoutSaving();
@@ -259,7 +267,7 @@ public final class KindMapConfigScreen extends Screen {
             macro.delayMs = parseMacroLong(macroDelayField.getValue(), macro.delayMs);
         }
         if (macroIntervalField != null) {
-            macro.intervalMs = parseMacroLong(macroIntervalField.getValue(), macro.intervalMs);
+            macro.intervalMs = parseMacroInterval(macroIntervalField.getValue(), macro.intervalMs);
         }
     }
 
@@ -301,6 +309,10 @@ public final class KindMapConfigScreen extends Screen {
 
     private long parseMacroLong(String value, long fallback) {
         return KindMapConfigDraft.parseLong(value, fallback, 0L);
+    }
+
+    private long parseMacroInterval(String value, long fallback) {
+        return KindMapConfigDraft.parseMacroInterval(value, fallback);
     }
 
     private static String valueOrEmpty(String value) {

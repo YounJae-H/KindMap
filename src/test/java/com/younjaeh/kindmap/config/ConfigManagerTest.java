@@ -232,7 +232,7 @@ final class ConfigManagerTest {
         ModConfig reloaded = manager.load();
 
         assertEquals(0L, reloaded.macros.getFirst().delayMs);
-        assertEquals(1000L, reloaded.macros.getFirst().intervalMs);
+        assertEquals(50L, reloaded.macros.getFirst().intervalMs);
     }
 
     @Test

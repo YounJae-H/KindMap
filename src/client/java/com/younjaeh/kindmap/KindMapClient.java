@@ -100,6 +100,14 @@ public final class KindMapClient implements ClientModInitializer {
         gammaController.apply();
     }
 
+    public void applyGammaFromConfig(boolean wasEnabled) {
+        if (gammaController == null || config == null) {
+            return;
+        }
+
+        gammaController.applyAfterConfigEdit(wasEnabled);
+    }
+
     private ModConfig loadConfig() {
         try {
             return configManager.load();

@@ -47,6 +47,20 @@ public final class GammaController {
         restoreNormalBrightness();
     }
 
+    public void applyAfterConfigEdit(boolean wasEnabled) {
+        if (config.enabled) {
+            if (!wasEnabled) {
+                captureCurrentNormalBrightness();
+            } else if (!normalBrightnessCaptured) {
+                loadPersistedNormalBrightness();
+            }
+            applyEnabledBrightness();
+            return;
+        }
+
+        restoreNormalBrightness();
+    }
+
     private void restoreNormalBrightness() {
         if (normalBrightnessCaptured) {
             brightness.setBrightness(normalBrightness);

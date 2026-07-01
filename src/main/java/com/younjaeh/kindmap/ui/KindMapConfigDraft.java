@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public final class KindMapConfigDraft {
+    public static final long MIN_MACRO_INTERVAL_MS = 50L;
+
     private KindMapConfigDraft() {
     }
 
@@ -68,6 +70,10 @@ public final class KindMapConfigDraft {
             return fallback;
         }
         return Math.max(min, parsed);
+    }
+
+    public static long parseMacroInterval(String value, long fallback) {
+        return parseLong(value, fallback, MIN_MACRO_INTERVAL_MS);
     }
 
     static MacroConfig newMacro() {

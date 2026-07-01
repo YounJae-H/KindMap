@@ -86,6 +86,24 @@ final class GammaControllerTest {
     }
 
     @Test
+    void applyingSettingsEnableCapturesCurrentNormalBrightness() {
+        GammaConfig config = GammaConfig.defaults();
+        config.enabled = false;
+        config.normalValue = 0.2;
+        FakeBrightness brightness = new FakeBrightness(0.8);
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        config.enabled = true;
+        controller.applyAfterConfigEdit(false);
+        config.enabled = false;
+        controller.applyAfterConfigEdit(true);
+
+        assertEquals(0.8, brightness.current);
+        assertEquals(0.8, config.normalValue);
+    }
+
+    @Test
     void togglingAfterNormalBrightnessChangeRestoresLatestNormalBrightness() {
         GammaConfig config = GammaConfig.defaults();
         FakeBrightness brightness = new FakeBrightness(0.5);

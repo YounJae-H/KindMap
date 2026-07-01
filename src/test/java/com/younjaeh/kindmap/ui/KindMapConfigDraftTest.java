@@ -57,4 +57,11 @@ final class KindMapConfigDraftTest {
         assertEquals(0L, KindMapConfigDraft.parseLong("-1", 300L, 0L));
         assertEquals(750L, KindMapConfigDraft.parseLong("750", 300L, 0L));
     }
+
+    @Test
+    void parsesMacroIntervalWithRuntimeMinimum() {
+        assertEquals(500L, KindMapConfigDraft.parseMacroInterval("bad", 500L));
+        assertEquals(50L, KindMapConfigDraft.parseMacroInterval("1", 500L));
+        assertEquals(75L, KindMapConfigDraft.parseMacroInterval("75", 500L));
+    }
 }

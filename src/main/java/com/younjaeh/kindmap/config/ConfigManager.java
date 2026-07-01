@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class ConfigManager {
+    private static final long MIN_MACRO_INTERVAL_MS = 50L;
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     private final Path configPath;
@@ -136,8 +137,8 @@ public final class ConfigManager {
         if (macro.delayMs < 0) {
             macro.delayMs = 0L;
         }
-        if (macro.intervalMs < 50) {
-            macro.intervalMs = 1000L;
+        if (macro.intervalMs < MIN_MACRO_INTERVAL_MS) {
+            macro.intervalMs = MIN_MACRO_INTERVAL_MS;
         }
         return macro;
     }
