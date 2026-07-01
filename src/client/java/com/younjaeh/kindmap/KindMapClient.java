@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.younjaeh.kindmap.config.ConfigManager;
 import com.younjaeh.kindmap.config.ModConfig;
 import com.younjaeh.kindmap.gamma.GammaController;
+import com.younjaeh.kindmap.gamma.GammaSliderRange;
 import com.younjaeh.kindmap.gamma.MinecraftBrightnessAccess;
 import com.younjaeh.kindmap.gamma.MinecraftGammaNotifier;
 import com.younjaeh.kindmap.macro.MacroKeySet;
@@ -114,6 +115,27 @@ public final class KindMapClient implements ClientModInitializer {
         gammaController.applyAfterConfigEdit(wasEnabled);
     }
 
+    public boolean isGammaEnabled() {
+        return config != null && config.gamma != null && config.gamma.enabled;
+    }
+
+    public double gammaMaxPercent() {
+        if (config == null || config.gamma == null) {
+            return 1500.0;
+        }
+        return GammaSliderRange.sanitizeMaxPercent(config.gamma.maxValue);
+    }
+
+    public void syncEnabledGammaFromVanillaSlider(double rawBrightness) {
+        if (!isGammaEnabled()) {
+            return;
+        }
+
+        double percent = GammaSliderRange.percentFromRawBrightness(rawBrightness);
+        config.gamma.enabledValue = clamp(percent, config.gamma.minValue, gammaMaxPercent());
+        saveConfig();
+    }
+
     private ModConfig loadConfig() {
         try {
             return configManager.load();
@@ -180,5 +202,20 @@ public final class KindMapClient implements ClientModInitializer {
         } catch (IllegalArgumentException exception) {
             return null;
         }
+    }
+
+    private static double clamp(double value, double min, double max) {
+        double lowerBound = Double.isFinite(min) && min >= 0.0 ? min : 0.0;
+        double upperBound = Double.isFinite(max) && max >= lowerBound ? max : 1500.0;
+        if (!Double.isFinite(value)) {
+            return upperBound;
+        }
+        if (value < lowerBound) {
+            return lowerBound;
+        }
+        if (value > upperBound) {
+            return upperBound;
+        }
+        return value;
     }
 }

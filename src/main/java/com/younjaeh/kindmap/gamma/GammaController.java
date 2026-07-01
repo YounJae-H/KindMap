@@ -96,7 +96,7 @@ public final class GammaController {
     }
 
     private void applyEnabledBrightness(double enabledPercent) {
-        brightness.setBrightness(enabledPercent / 100.0);
+        brightness.setBrightness(GammaSliderRange.rawBrightnessFromPercent(enabledPercent));
     }
 
     private double sanitizeEnabledBrightness() {
@@ -136,6 +136,6 @@ public final class GammaController {
     }
 
     private static int rawBrightnessToDisplayPercent(double value) {
-        return toDisplayPercent(value * 100.0);
+        return GammaSliderRange.displayPercentFromRawBrightness(value);
     }
 }
