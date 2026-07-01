@@ -18,34 +18,88 @@ public final class GammaController {
     }
 
     public void initialize() {
-        apply();
+        if (config.enabled) {
+            loadPersistedNormalBrightness();
+            applyEnabledBrightness();
+        }
     }
 
     public void toggle() {
         config.enabled = !config.enabled;
-        apply();
+        if (config.enabled) {
+            captureCurrentNormalBrightness();
+            applyEnabledBrightness();
+        } else {
+            restoreNormalBrightness();
+        }
         saveCallback.run();
     }
 
     public void apply() {
         if (config.enabled) {
-            captureNormalBrightness();
-            brightness.setBrightness(config.enabledValue);
+            if (!normalBrightnessCaptured) {
+                loadPersistedNormalBrightness();
+            }
+            applyEnabledBrightness();
             return;
         }
 
+        restoreNormalBrightness();
+    }
+
+    private void restoreNormalBrightness() {
         if (normalBrightnessCaptured) {
             brightness.setBrightness(normalBrightness);
+            config.normalValue = normalBrightness;
             normalBrightnessCaptured = false;
         }
     }
 
-    private void captureNormalBrightness() {
-        if (normalBrightnessCaptured) {
-            return;
+    private void captureCurrentNormalBrightness() {
+        normalBrightness = brightness.getBrightness();
+        config.normalValue = normalBrightness;
+        normalBrightnessCaptured = true;
+    }
+
+    private void loadPersistedNormalBrightness() {
+        normalBrightness = sanitizeNormalBrightness(config.normalValue);
+        config.normalValue = normalBrightness;
+        normalBrightnessCaptured = true;
+    }
+
+    private void applyEnabledBrightness() {
+        brightness.setBrightness(sanitizeEnabledBrightness());
+    }
+
+    private double sanitizeEnabledBrightness() {
+        double minValue = config.minValue;
+        if (!Double.isFinite(minValue) || minValue < 0.0) {
+            minValue = 0.0;
         }
 
-        normalBrightness = brightness.getBrightness();
-        normalBrightnessCaptured = true;
+        double maxValue = config.maxValue;
+        if (!Double.isFinite(maxValue) || maxValue < 2.0 || maxValue < minValue) {
+            minValue = 0.0;
+            maxValue = 1500.0;
+        }
+
+        double enabledValue = config.enabledValue;
+        if (!Double.isFinite(enabledValue)) {
+            return maxValue;
+        }
+        if (enabledValue < minValue) {
+            return minValue;
+        }
+        if (enabledValue > maxValue) {
+            return maxValue;
+        }
+        return enabledValue;
+    }
+
+    private static double sanitizeNormalBrightness(double value) {
+        if (!Double.isFinite(value) || value < 0.0) {
+            return 0.5;
+        }
+        return value;
     }
 }

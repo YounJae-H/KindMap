@@ -42,6 +42,7 @@ final class GammaControllerTest {
     void togglingOffRestoresNormalBrightnessAndPersists() {
         GammaConfig config = GammaConfig.defaults();
         config.enabled = true;
+        config.normalValue = 0.5;
         FakeBrightness brightness = new FakeBrightness(0.5);
         SaveCounter saveCounter = new SaveCounter();
         GammaController controller = new GammaController(config, brightness, saveCounter);
@@ -52,6 +53,36 @@ final class GammaControllerTest {
         assertFalse(config.enabled);
         assertEquals(0.5, brightness.current);
         assertEquals(1, saveCounter.count);
+    }
+
+    @Test
+    void startupEnabledUsesPersistedNormalBrightnessWhenCurrentBrightnessIsBoosted() {
+        GammaConfig config = GammaConfig.defaults();
+        config.enabled = true;
+        config.enabledValue = 1500.0;
+        config.normalValue = 0.5;
+        FakeBrightness brightness = new FakeBrightness(1500.0);
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        controller.initialize();
+        controller.toggle();
+
+        assertFalse(config.enabled);
+        assertEquals(0.5, brightness.current);
+    }
+
+    @Test
+    void togglingOnStoresNormalBrightnessForFutureRestores() {
+        GammaConfig config = GammaConfig.defaults();
+        FakeBrightness brightness = new FakeBrightness(0.8);
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        controller.toggle();
+
+        assertTrue(config.enabled);
+        assertEquals(0.8, config.normalValue);
     }
 
     @Test
@@ -75,6 +106,22 @@ final class GammaControllerTest {
         GammaConfig config = GammaConfig.defaults();
         config.enabled = true;
         config.enabledValue = 100.0;
+        FakeBrightness brightness = new FakeBrightness(0.5);
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        controller.initialize();
+
+        assertEquals(100.0, brightness.current);
+    }
+
+    @Test
+    void clampsRuntimeEnabledValueBeforeApplying() {
+        GammaConfig config = GammaConfig.defaults();
+        config.enabled = true;
+        config.enabledValue = 999.0;
+        config.minValue = 0.0;
+        config.maxValue = 100.0;
         FakeBrightness brightness = new FakeBrightness(0.5);
         GammaController controller = new GammaController(config, brightness, () -> {
         });

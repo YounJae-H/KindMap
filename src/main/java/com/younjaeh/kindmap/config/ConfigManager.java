@@ -69,18 +69,24 @@ public final class ConfigManager {
 
     private static GammaConfig validateGamma(GammaConfig gamma) {
         GammaConfig validated = gamma == null ? GammaConfig.defaults() : gamma;
-        if (validated.minValue < 0.0) {
+        if (!Double.isFinite(validated.minValue) || validated.minValue < 0.0) {
             validated.minValue = 0.0;
         }
-        if (validated.maxValue < 2.0 || validated.maxValue < validated.minValue) {
+        if (!Double.isFinite(validated.maxValue) || validated.maxValue < 2.0 || validated.maxValue < validated.minValue) {
             validated.minValue = 0.0;
             validated.maxValue = 1500.0;
+        }
+        if (!Double.isFinite(validated.enabledValue)) {
+            validated.enabledValue = validated.maxValue;
         }
         if (validated.enabledValue < validated.minValue) {
             validated.enabledValue = validated.minValue;
         }
         if (validated.enabledValue > validated.maxValue) {
             validated.enabledValue = validated.maxValue;
+        }
+        if (!Double.isFinite(validated.normalValue) || validated.normalValue < 0.0) {
+            validated.normalValue = 0.5;
         }
         if (isBlank(validated.toggleKey)) {
             validated.toggleKey = "key.keyboard.g";

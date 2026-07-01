@@ -23,6 +23,7 @@ final class ConfigManagerTest {
 
         assertFalse(config.gamma.enabled);
         assertEquals(1500.0, config.gamma.enabledValue);
+        assertEquals(0.5, config.gamma.normalValue);
         assertEquals("key.keyboard.g", config.gamma.toggleKey);
         assertTrue(Files.exists(tempDir.resolve("kindmap.json")));
     }
@@ -90,9 +91,32 @@ final class ConfigManagerTest {
 
         assertFalse(config.gamma.enabled);
         assertEquals(1500.0, config.gamma.enabledValue);
+        assertEquals(0.5, config.gamma.normalValue);
         assertEquals("key.keyboard.g", config.gamma.toggleKey);
         assertEquals(0.0, config.gamma.minValue);
         assertEquals(1500.0, config.gamma.maxValue);
+    }
+
+    @Test
+    void defaultsInvalidGammaNormalValue() {
+        ModConfig config = ModConfig.defaults();
+        config.gamma.normalValue = Double.NaN;
+
+        ModConfig validated = ConfigManager.validate(config);
+
+        assertEquals(0.5, validated.gamma.normalValue);
+
+        config.gamma.normalValue = Double.POSITIVE_INFINITY;
+
+        validated = ConfigManager.validate(config);
+
+        assertEquals(0.5, validated.gamma.normalValue);
+
+        config.gamma.normalValue = -0.1;
+
+        validated = ConfigManager.validate(config);
+
+        assertEquals(0.5, validated.gamma.normalValue);
     }
 
     @Test
