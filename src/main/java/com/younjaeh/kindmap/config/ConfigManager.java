@@ -2,6 +2,7 @@ package com.younjaeh.kindmap.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.younjaeh.kindmap.macro.MacroAction;
 import com.younjaeh.kindmap.macro.MacroMode;
 
@@ -12,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public final class ConfigManager {
@@ -20,7 +22,7 @@ public final class ConfigManager {
     private final Path configPath;
 
     public ConfigManager(Path configPath) {
-        this.configPath = configPath;
+        this.configPath = Objects.requireNonNull(configPath, "configPath");
     }
 
     public ModConfig load() throws IOException {
@@ -33,6 +35,10 @@ public final class ConfigManager {
         ModConfig config;
         try (Reader reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8)) {
             config = GSON.fromJson(reader, ModConfig.class);
+        } catch (JsonParseException exception) {
+            ModConfig defaults = ModConfig.defaults();
+            save(defaults);
+            return defaults;
         }
 
         ModConfig validated = validate(config);
@@ -112,10 +118,10 @@ public final class ConfigManager {
             macro.mode = MacroMode.SIMPLE;
         }
         if (macro.delayMs < 0) {
-            macro.delayMs = 0;
+            macro.delayMs = 0L;
         }
         if (macro.intervalMs < 50) {
-            macro.intervalMs = 1000;
+            macro.intervalMs = 1000L;
         }
         return macro;
     }

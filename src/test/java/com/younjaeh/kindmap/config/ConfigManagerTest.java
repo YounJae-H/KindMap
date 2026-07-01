@@ -66,4 +66,53 @@ final class ConfigManagerTest {
 
         assertEquals("/엔더", reloaded.macros.getFirst().content);
     }
+
+    @Test
+    void defaultsMacroEnabledAndUsesLongSchedulingFields() throws Exception {
+        MacroConfig macro = MacroConfig.defaults();
+
+        assertTrue(macro.enabled);
+        assertEquals(long.class, MacroConfig.class.getField("delayMs").getType());
+        assertEquals(long.class, MacroConfig.class.getField("intervalMs").getType());
+        assertEquals(0L, macro.delayMs);
+        assertEquals(1000L, macro.intervalMs);
+    }
+
+    @Test
+    void preservesDisabledMacroWhenSavingAndLoading() throws Exception {
+        ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
+        ModConfig config = ModConfig.defaults();
+        MacroConfig macro = MacroConfig.defaults();
+        macro.enabled = false;
+        config.macros.add(macro);
+
+        manager.save(config);
+        ModConfig reloaded = manager.load();
+
+        assertFalse(reloaded.macros.getFirst().enabled);
+    }
+
+    @Test
+    void recoversDefaultsFromMalformedJson() throws Exception {
+        Path file = tempDir.resolve("kindmap.json");
+        Files.writeString(file, "{ invalid json", java.nio.charset.StandardCharsets.UTF_8);
+        ConfigManager manager = new ConfigManager(file);
+
+        ModConfig config = manager.load();
+
+        assertFalse(config.gamma.enabled);
+        assertEquals("key.keyboard.g", config.gamma.toggleKey);
+        assertTrue(config.macros.isEmpty());
+        assertDoesNotThrow(() -> new ConfigManager(file).load());
+    }
+
+    @Test
+    void rejectsNullConfigPath() {
+        NullPointerException exception = assertThrows(
+            NullPointerException.class,
+            () -> new ConfigManager(null)
+        );
+
+        assertEquals("configPath", exception.getMessage());
+    }
 }
