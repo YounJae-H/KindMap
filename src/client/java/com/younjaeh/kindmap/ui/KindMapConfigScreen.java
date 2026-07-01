@@ -222,8 +222,8 @@ public final class KindMapConfigScreen extends Screen {
         if (client != null && client.config() != null) {
             boolean gammaWasEnabled = client.config().gamma != null && client.config().gamma.enabled;
             KindMapConfigDraft.applyTo(client.config(), draft);
-            client.saveConfig();
             client.applyGammaFromConfig(gammaWasEnabled);
+            client.saveConfig();
             client.reloadMacrosFromConfig();
         }
         closeWithoutSaving();
