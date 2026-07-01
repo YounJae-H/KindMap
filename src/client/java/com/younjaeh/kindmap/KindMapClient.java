@@ -92,6 +92,14 @@ public final class KindMapClient implements ClientModInitializer {
         macroPressedKeys.clear();
     }
 
+    public void applyGammaFromConfig() {
+        if (gammaController == null || config == null) {
+            return;
+        }
+
+        gammaController.apply();
+    }
+
     private ModConfig loadConfig() {
         try {
             return configManager.load();

@@ -215,6 +215,7 @@ public final class KindMapConfigScreen extends Screen {
         if (client != null && client.config() != null) {
             KindMapConfigDraft.applyTo(client.config(), draft);
             client.saveConfig();
+            client.applyGammaFromConfig();
             client.reloadMacrosFromConfig();
         }
         closeWithoutSaving();
