@@ -105,7 +105,7 @@ public final class MacroManager {
         if (toggledNextRunMs.containsKey(macro.id)) {
             toggledNextRunMs.remove(macro.id);
         } else {
-            toggledNextRunMs.put(macro.id, nowMs + intervalMs(macro));
+            toggledNextRunMs.put(macro.id, nowMs);
         }
     }
 
@@ -135,7 +135,7 @@ public final class MacroManager {
     }
 
     private static long intervalMs(MacroConfig macro) {
-        return Math.max(0L, macro.intervalMs);
+        return Math.max(50L, macro.intervalMs);
     }
 
     private static boolean isBlank(String value) {

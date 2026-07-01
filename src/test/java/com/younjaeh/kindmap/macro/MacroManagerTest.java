@@ -95,19 +95,31 @@ final class MacroManagerTest {
     }
 
     @Test
+    void repeatingMacroDoesNotDoubleFireWithZeroIntervalOnSameTick() {
+        MacroConfig macro = macro("repeat-zero", MacroAction.SEND, MacroMode.REPEATING);
+        macro.intervalMs = 0L;
+        manager.setMacros(List.of(macro));
+
+        manager.onKeyPressed(GRAVE, 1000L, false);
+        manager.onKeyHeld(GRAVE, 1000L, false);
+
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+    }
+
+    @Test
     void toggleMacroRepeatsUntilPressedAgain() {
         MacroConfig macro = macro("toggle", MacroAction.SEND, MacroMode.TOGGLE);
         macro.intervalMs = 200L;
         manager.setMacros(List.of(macro));
 
         manager.onKeyPressed(GRAVE, 1000L, false);
-        manager.tick(1199L);
-        assertEquals(List.of(), chatExecutor.events);
-
-        manager.tick(1200L);
+        manager.tick(1000L);
         assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
 
-        manager.tick(1400L);
+        manager.tick(1199L);
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+
+        manager.tick(1200L);
         assertEquals(List.of("SEND:" + ENDER, "SEND:" + ENDER), chatExecutor.events);
 
         manager.onKeyPressed(GRAVE, 1500L, false);
