@@ -1,5 +1,7 @@
 package com.younjaeh.kindmap.config;
 
+import com.younjaeh.kindmap.macro.MacroAction;
+import com.younjaeh.kindmap.macro.MacroMode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -95,6 +97,10 @@ final class ConfigManagerTest {
         assertTrue(macro.enabled);
         assertFalse(macro.id.isBlank());
         assertDoesNotThrow(() -> UUID.fromString(macro.id));
+        assertEquals("", macro.key);
+        assertEquals("", macro.content);
+        assertEquals(MacroAction.SEND, macro.action);
+        assertEquals(MacroMode.SIMPLE, macro.mode);
         assertEquals(long.class, MacroConfig.class.getField("delayMs").getType());
         assertEquals(long.class, MacroConfig.class.getField("intervalMs").getType());
         assertEquals(0L, macro.delayMs);
