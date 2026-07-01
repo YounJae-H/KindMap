@@ -55,6 +55,22 @@ final class GammaControllerTest {
     }
 
     @Test
+    void togglingAfterNormalBrightnessChangeRestoresLatestNormalBrightness() {
+        GammaConfig config = GammaConfig.defaults();
+        FakeBrightness brightness = new FakeBrightness(0.5);
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        controller.toggle();
+        controller.toggle();
+        brightness.current = 0.8;
+        controller.toggle();
+        controller.toggle();
+
+        assertEquals(0.8, brightness.current);
+    }
+
+    @Test
     void appliesCurrentConfigEnabledValue() {
         GammaConfig config = GammaConfig.defaults();
         config.enabled = true;

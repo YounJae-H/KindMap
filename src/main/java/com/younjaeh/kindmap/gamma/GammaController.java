@@ -36,6 +36,7 @@ public final class GammaController {
 
         if (normalBrightnessCaptured) {
             brightness.setBrightness(normalBrightness);
+            normalBrightnessCaptured = false;
         }
     }
 
