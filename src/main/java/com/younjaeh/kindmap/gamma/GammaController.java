@@ -23,11 +23,16 @@ public final class GammaController {
         this.notifier = Objects.requireNonNull(notifier, "notifier");
     }
 
-    public void initialize() {
+    public boolean initialize() {
+        if (!brightness.isReady()) {
+            return !config.enabled;
+        }
+
         if (config.enabled) {
             loadPersistedNormalBrightness();
             applyEnabledBrightness();
         }
+        return true;
     }
 
     public void toggle() {

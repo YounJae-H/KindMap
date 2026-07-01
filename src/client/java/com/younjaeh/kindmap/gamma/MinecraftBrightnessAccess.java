@@ -18,6 +18,11 @@ public final class MinecraftBrightnessAccess implements BrightnessAccess {
     }
 
     @Override
+    public boolean isReady() {
+        return client.options != null;
+    }
+
+    @Override
     public double getBrightness() {
         return client.options.gamma().get();
     }

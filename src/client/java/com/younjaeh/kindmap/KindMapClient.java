@@ -40,6 +40,7 @@ public final class KindMapClient implements ClientModInitializer {
     private GammaController gammaController;
     private MacroManager macroManager;
     private KeyMapping gammaKeyMapping;
+    private boolean gammaInitialized;
     private final Map<String, Boolean> macroPressedKeys = new HashMap<>();
 
     @Override
@@ -65,7 +66,7 @@ public final class KindMapClient implements ClientModInitializer {
                 KEY_CATEGORY
         ));
 
-        gammaController.initialize();
+        gammaInitialized = gammaController.initialize();
 
         ClientTickEvents.END_CLIENT_TICK.register(this::onEndClientTick);
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> saveConfig());
@@ -145,6 +146,10 @@ public final class KindMapClient implements ClientModInitializer {
     }
 
     private void onEndClientTick(Minecraft client) {
+        if (!gammaInitialized) {
+            gammaInitialized = gammaController.initialize();
+        }
+
         while (gammaKeyMapping.consumeClick()) {
             gammaController.toggle();
         }

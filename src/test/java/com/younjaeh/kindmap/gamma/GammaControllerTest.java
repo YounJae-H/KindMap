@@ -24,6 +24,25 @@ final class GammaControllerTest {
     }
 
     @Test
+    void enabledStartupDefersUntilBrightnessOptionsAreReady() {
+        GammaConfig config = GammaConfig.defaults();
+        config.enabled = true;
+        config.enabledValue = 1500.0;
+        FakeBrightness brightness = new FakeBrightness(0.5);
+        brightness.ready = false;
+        GammaController controller = new GammaController(config, brightness, () -> {
+        });
+
+        assertFalse(controller.initialize());
+        assertEquals(0.5, brightness.current);
+
+        brightness.ready = true;
+
+        assertTrue(controller.initialize());
+        assertEquals(15.0, brightness.current);
+    }
+
+    @Test
     void togglingOnPersistsState() {
         GammaConfig config = GammaConfig.defaults();
         FakeBrightness brightness = new FakeBrightness(0.5);
@@ -186,9 +205,15 @@ final class GammaControllerTest {
 
     private static final class FakeBrightness implements BrightnessAccess {
         private double current;
+        private boolean ready = true;
 
         private FakeBrightness(double current) {
             this.current = current;
+        }
+
+        @Override
+        public boolean isReady() {
+            return ready;
         }
 
         @Override
