@@ -10,6 +10,10 @@ base {
     archivesName = project.archives_base_name
 }
 
+repositories {
+    maven { url = 'https://maven.terraformersmc.com/releases/' }
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -22,6 +26,7 @@ loom {
 
     mods {
         kindmap {
+            sourceSet sourceSets.main
             sourceSet sourceSets.client
         }
     }
@@ -31,9 +36,13 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:intermediary:0.0.0:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+    // These are plain classpath dependencies to avoid Loom source remap failures with 26.1.2 intermediary-v2.
     compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    runtimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
