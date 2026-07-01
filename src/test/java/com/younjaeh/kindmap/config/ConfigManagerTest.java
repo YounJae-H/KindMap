@@ -126,6 +126,22 @@ final class ConfigManagerTest {
     }
 
     @Test
+    void clampsInvalidMacroSchedulingValues() throws Exception {
+        ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
+        ModConfig config = ModConfig.defaults();
+        MacroConfig macro = MacroConfig.defaults();
+        macro.delayMs = -1L;
+        macro.intervalMs = 1L;
+        config.macros.add(macro);
+
+        manager.save(config);
+        ModConfig reloaded = manager.load();
+
+        assertEquals(0L, reloaded.macros.getFirst().delayMs);
+        assertEquals(1000L, reloaded.macros.getFirst().intervalMs);
+    }
+
+    @Test
     void recoversDefaultsFromMalformedJson() throws Exception {
         Path file = tempDir.resolve("kindmap.json");
         Files.writeString(file, "{ invalid json", java.nio.charset.StandardCharsets.UTF_8);
