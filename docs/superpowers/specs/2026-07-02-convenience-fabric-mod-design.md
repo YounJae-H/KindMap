@@ -14,13 +14,12 @@ The mod should work in a Feather Client Fabric profile shown as `26.1.2-FB`, whi
 - Minecraft: `26.1.2`
 - Fabric Loader: `0.19.3`
 - Fabric API: `0.154.0+26.1.2`
-- Mapping strategy: Mojang official mappings
+- Mapping strategy: Fabric intermediary v2 mappings
 - Runtime side: client only
-- Optional UI integrations:
+- Optional UI integration:
   - Mod Menu for opening the config screen
-  - Cloth Config for settings UI widgets
 
-Yarn mappings are not the primary choice because current Fabric metadata showed `26.1.2` as a stable game target while the Yarn listing did not expose matching `26.x` mappings during verification.
+Yarn mappings are not the primary choice because current Fabric metadata showed `26.1.2` as a stable game target while the Yarn listing did not expose matching `26.x` mappings during verification. Mojang's `26.1.2` metadata also did not expose official mapping downloads, so the build uses Fabric intermediary v2 mappings.
 
 ## Gamma Feature
 
@@ -87,7 +86,7 @@ Input behavior:
 
 - Macro key input is captured in the mod's macro edit screen.
 - The macro runner listens on client tick/key input and ignores macro execution while text fields, chat input, or other typing screens are focused.
-- Duplicate macro keys are allowed only if the UI clearly marks them as conflicts; the recommended default is to warn and keep the macro disabled until resolved.
+- Duplicate macro keys are allowed; if multiple enabled macros share a key, the runtime executes each matching macro.
 
 Safety behavior:
 
@@ -103,7 +102,7 @@ Mod Menu opens the main config screen. The screen has two sections:
    - Toggle current on/off state.
    - Enabled gamma value slider/input.
    - Min/max bounds if exposed.
-   - Keybind capture for gamma toggle, default `G`.
+   - Gamma toggle key is registered in Minecraft Controls, default `G`.
 
 2. Macros
    - List macros.
@@ -115,7 +114,7 @@ Mod Menu opens the main config screen. The screen has two sections:
    - Choose action: send or type.
    - Choose mode: simple, delayed, repeating, toggle.
    - Configure delay/interval where relevant.
-   - Show duplicate key conflicts.
+   - Duplicate keys are allowed and execute each matching enabled macro.
 
 The UI should avoid status text overlays during gameplay. Settings labels can be visible inside the settings screen.
 
@@ -170,9 +169,9 @@ Suggested package layout:
 - `macro/Macro`: macro model.
 - `macro/MacroAction`, `MacroMode`: enums.
 - `macro/MacroManager`: key matching, scheduling, repeat/toggle state.
-- `ui/ConfigScreenFactory`: Mod Menu integration.
-- `ui/GammaConfigScreen` or Cloth Config category builder.
-- `ui/MacroListScreen` and `ui/MacroEditScreen`: macro management.
+- `ui/ModMenuIntegration`: Mod Menu integration.
+- `ui/KindMapConfigScreen`: custom vanilla settings screen.
+- `ui/KindMapConfigDraft`: draft/copy helpers so cancel does not mutate live config.
 
 The gamma and macro systems should not depend on each other except through shared config loading/saving.
 

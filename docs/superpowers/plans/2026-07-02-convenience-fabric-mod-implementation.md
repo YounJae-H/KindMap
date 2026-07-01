@@ -6,7 +6,9 @@
 
 **Architecture:** Create a small Fabric client project with separate config, gamma, macro, and UI packages. Keep gamma and macro logic testable through plain Java adapters, then wire them into Fabric client events and Mod Menu.
 
-**Tech Stack:** Java 25, Gradle 9.6.1 wrapper, Fabric Loom 1.17.13, Fabric Loader 0.19.3, Fabric API 0.154.0+26.1.2, Mojang official mappings, Mod Menu 18.0.0-beta.1, Cloth Config 26.1.154+fabric, Gson, JUnit 5.
+**Tech Stack:** Java 25, Gradle 9.6.1 wrapper, Fabric Loom 1.17.13, Fabric Loader 0.19.3, Fabric API 0.154.0+26.1.2, Fabric intermediary v2 mappings, Mod Menu 18.0.0-beta.1, Gson, JUnit 5.
+
+**Implementation note:** Mojang official mapping downloads and matching Yarn mappings were not available for `26.1.2` during setup, so the working build uses `net.fabricmc:intermediary:0.0.0:v2`. Fabric API and Mod Menu are kept as plain compile/runtime classpath dependencies to avoid Loom source remap failures under this mapping set. Cloth Config was removed; settings are implemented with a custom vanilla `Screen`.
 
 ---
 
@@ -34,7 +36,7 @@
 - Create `src/main/java/com/younjaeh/kindmap/macro/MacroManager.java`: macro key matching and scheduling.
 - Create `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`: Mod Menu config hook.
 - Create `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`: main settings screen.
-- Create `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`: macro add/edit screen.
+- Create `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigDraft.java`: draft config helper for the settings screen.
 - Create `src/test/java/com/younjaeh/kindmap/config/ConfigManagerTest.java`: config tests.
 - Create `src/test/java/com/younjaeh/kindmap/gamma/GammaControllerTest.java`: gamma tests.
 - Create `src/test/java/com/younjaeh/kindmap/macro/MacroManagerTest.java`: macro tests.
@@ -71,7 +73,6 @@ dependencyResolutionManagement {
     repositories {
         maven { url = 'https://maven.fabricmc.net/' }
         maven { url = 'https://maven.terraformersmc.com/releases/' }
-        maven { url = 'https://maven.shedaniel.me/' }
         mavenCentral()
     }
 }
@@ -97,7 +98,6 @@ maven_group=com.younjaeh
 archives_base_name=kindmap
 
 modmenu_version=18.0.0-beta.1
-cloth_config_version=26.1.154
 ```
 
 - [ ] **Step 3: Create build script**
@@ -136,12 +136,13 @@ loom {
 
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
+    mappings "net.fabricmc:intermediary:0.0.0:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    compileOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    runtimeOnly "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modImplementation "com.terraformersmc:modmenu:${project.modmenu_version}"
-    modImplementation "me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}+fabric"
+    compileOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
+    runtimeOnly "com.terraformersmc:modmenu:${project.modmenu_version}"
 
     testImplementation platform('org.junit:junit-bom:5.13.4')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -209,7 +210,6 @@ Create `src/main/resources/fabric.mod.json`:
   },
   "suggests": {
     "modmenu": "*",
-    "cloth-config": "*"
   }
 }
 ```
@@ -1312,138 +1312,44 @@ Expected: commit succeeds.
 **Files:**
 - Create: `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`
 - Create: `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`
-- Create: `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`
+- Create: `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigDraft.java`
+- Create: `src/test/java/com/younjaeh/kindmap/ui/KindMapConfigDraftTest.java`
+- Modify: `src/client/java/com/younjaeh/kindmap/KindMapClient.java`
+- Modify: `src/main/resources/assets/kindmap/lang/en_us.json`
 
 - [ ] **Step 1: Create Mod Menu entrypoint**
 
-Create `src/main/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java`:
+Create `src/client/java/com/younjaeh/kindmap/ui/ModMenuIntegration.java` so Mod Menu opens `KindMapConfigScreen::create`.
 
-```java
-package com.younjaeh.kindmap.ui;
+- [ ] **Step 2: Add draft helper**
 
-import com.terraformersmc.modmenu.api.ConfigScreenFactory;
-import com.terraformersmc.modmenu.api.ModMenuApi;
+Create `KindMapConfigDraft` and tests so the settings screen can edit a copy of the live config. Cancel/back must return to the parent screen without mutating the live config; Done must copy draft values back to the live config.
 
-public final class ModMenuIntegration implements ModMenuApi {
-    @Override
-    public ConfigScreenFactory<?> getModConfigScreenFactory() {
-        return KindMapConfigScreen::create;
-    }
-}
-```
+- [ ] **Step 3: Create main config screen**
 
-- [ ] **Step 2: Create main config screen**
-
-Create `src/main/java/com/younjaeh/kindmap/ui/KindMapConfigScreen.java`:
-
-```java
-package com.younjaeh.kindmap.ui;
-
-import com.younjaeh.kindmap.KindMapClient;
-import com.younjaeh.kindmap.config.ModConfig;
-import me.shedaniel.clothconfig2.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.api.ConfigCategory;
-import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-
-public final class KindMapConfigScreen {
-    private KindMapConfigScreen() {
-    }
-
-    public static Screen create(Screen parent) {
-        KindMapClient mod = KindMapClient.instance();
-        ModConfig config = mod.config();
-        ConfigBuilder builder = ConfigBuilder.create()
-            .setParentScreen(parent)
-            .setTitle(Component.translatable("text.kindmap.title"))
-            .setSavingRunnable(mod::saveConfig);
-
-        ConfigEntryBuilder entries = builder.entryBuilder();
-        ConfigCategory gamma = builder.getOrCreateCategory(Component.translatable("text.kindmap.gamma"));
-        gamma.addEntry(entries.startBooleanToggle(Component.translatable("text.kindmap.gamma.enabled"), config.gamma.enabled)
-            .setDefaultValue(false)
-            .setSaveConsumer(value -> config.gamma.enabled = value)
-            .build());
-        gamma.addEntry(entries.startDoubleField(Component.translatable("text.kindmap.gamma.enabled_value"), config.gamma.enabledValue)
-            .setDefaultValue(1500.0)
-            .setMin(config.gamma.minValue)
-            .setMax(config.gamma.maxValue)
-            .setSaveConsumer(value -> config.gamma.enabledValue = value)
-            .build());
-
-        ConfigCategory macros = builder.getOrCreateCategory(Component.translatable("text.kindmap.macros"));
-        macros.addEntry(entries.startTextDescription(Component.literal("Use Add Macro to create key-bound commands or chat text.")).build());
-
-        return builder.build();
-    }
-}
-```
-
-- [ ] **Step 3: Create macro edit screen shell**
-
-Create `src/main/java/com/younjaeh/kindmap/ui/MacroEditScreen.java`:
-
-```java
-package com.younjaeh.kindmap.ui;
-
-import com.younjaeh.kindmap.config.MacroConfig;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-
-public final class MacroEditScreen extends Screen {
-    private final Screen parent;
-    private final MacroConfig macro;
-
-    public MacroEditScreen(Screen parent, MacroConfig macro) {
-        super(Component.translatable("text.kindmap.edit_macro"));
-        this.parent = parent;
-        this.macro = macro;
-    }
-
-    @Override
-    public void onClose() {
-        this.minecraft.setScreen(parent);
-    }
-
-    public MacroConfig macro() {
-        return macro;
-    }
-}
-```
+Create `KindMapConfigScreen` with vanilla Minecraft widgets. It should edit gamma enabled/value and support macro add/delete/select plus enabled/name/key/content/action/mode/delay/interval fields. The key capture button should store `InputConstants.getKey(event).getName()`.
 
 - [ ] **Step 4: Compile UI**
 
 Run:
 
 ```powershell
-.\gradlew.bat compileJava --no-daemon
+.\gradlew.bat compileClientJava compileJava --no-daemon
 ```
 
 Expected: PASS.
 
-- [ ] **Step 5: Expand macro UI**
+- [ ] **Step 5: Apply settings to runtime**
 
-Add entries to the Macros category for each macro:
-
-```java
-for (MacroConfig macro : config.macros) {
-    macros.addEntry(entries.startBooleanToggle(Component.literal(macro.name), macro.enabled)
-        .setDefaultValue(true)
-        .setSaveConsumer(value -> macro.enabled = value)
-        .build());
-}
-```
-
-Expected: existing macros can be enabled/disabled from Mod Menu.
+Done should apply the draft to `KindMapClient.config()`, call `saveConfig()`, call `applyGammaFromConfig()`, and call `reloadMacrosFromConfig()`. Cancel/back should only return to the parent screen.
 
 - [ ] **Step 6: Commit settings UI**
 
 Run:
 
 ```powershell
-git add src/main/java/com/younjaeh/kindmap/ui src/main/resources
-git commit -m "feat: add mod menu settings"
+git add src/client/java/com/younjaeh/kindmap src/main/java/com/younjaeh/kindmap/ui src/test/java/com/younjaeh/kindmap/ui src/main/resources
+git commit -m "feat: add KindMap settings screen"
 ```
 
 Expected: commit succeeds.
