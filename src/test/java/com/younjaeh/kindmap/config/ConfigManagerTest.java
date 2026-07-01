@@ -93,6 +93,39 @@ final class ConfigManagerTest {
     }
 
     @Test
+    void defaultsMissingMacroEnabledToTrue() throws Exception {
+        Path file = tempDir.resolve("kindmap.json");
+        Files.writeString(file, """
+            {
+              "gamma": {
+                "enabled": false,
+                "enabledValue": 1500.0,
+                "toggleKey": "key.keyboard.g",
+                "minValue": 0.0,
+                "maxValue": 1500.0
+              },
+              "macros": [
+                {
+                  "id": "legacy",
+                  "name": "Legacy",
+                  "key": "",
+                  "content": "/spawn",
+                  "action": "SEND",
+                  "mode": "SIMPLE",
+                  "delayMs": 0,
+                  "intervalMs": 1000
+                }
+              ]
+            }
+            """);
+        ConfigManager manager = new ConfigManager(file);
+
+        ModConfig config = manager.load();
+
+        assertTrue(config.macros.getFirst().enabled);
+    }
+
+    @Test
     void recoversDefaultsFromMalformedJson() throws Exception {
         Path file = tempDir.resolve("kindmap.json");
         Files.writeString(file, "{ invalid json", java.nio.charset.StandardCharsets.UTF_8);

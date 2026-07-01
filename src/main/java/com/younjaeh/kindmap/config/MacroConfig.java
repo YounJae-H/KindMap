@@ -4,7 +4,7 @@ import com.younjaeh.kindmap.macro.MacroAction;
 import com.younjaeh.kindmap.macro.MacroMode;
 
 public final class MacroConfig {
-    public boolean enabled;
+    public boolean enabled = true;
     public String id;
     public String name;
     public String key;
