@@ -13,7 +13,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 public final class ConfigManager {
@@ -85,6 +87,7 @@ public final class ConfigManager {
 
     private static ArrayList<MacroConfig> validateMacros(Iterable<MacroConfig> macros) {
         ArrayList<MacroConfig> validated = new ArrayList<>();
+        Set<String> seenIds = new HashSet<>();
         if (macros == null) {
             return validated;
         }
@@ -94,6 +97,10 @@ public final class ConfigManager {
                 continue;
             }
             validated.add(validateMacro(macro));
+            if (isBlank(macro.id) || !seenIds.add(macro.id)) {
+                macro.id = UUID.randomUUID().toString();
+                seenIds.add(macro.id);
+            }
         }
         return validated;
     }

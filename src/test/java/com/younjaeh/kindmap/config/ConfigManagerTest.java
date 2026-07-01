@@ -155,6 +155,25 @@ final class ConfigManagerTest {
     }
 
     @Test
+    void deduplicatesDuplicateMacroIds() throws Exception {
+        ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
+        ModConfig config = ModConfig.defaults();
+        MacroConfig first = MacroConfig.defaults();
+        MacroConfig second = MacroConfig.defaults();
+        first.id = "same";
+        second.id = "same";
+        config.macros.add(first);
+        config.macros.add(second);
+
+        manager.save(config);
+        ModConfig reloaded = manager.load();
+
+        assertFalse(reloaded.macros.get(0).id.isBlank());
+        assertFalse(reloaded.macros.get(1).id.isBlank());
+        assertNotEquals(reloaded.macros.get(0).id, reloaded.macros.get(1).id);
+    }
+
+    @Test
     void clampsInvalidMacroSchedulingValues() throws Exception {
         ConfigManager manager = new ConfigManager(tempDir.resolve("kindmap.json"));
         ModConfig config = ModConfig.defaults();
