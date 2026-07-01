@@ -76,8 +76,11 @@ public final class ConfigManager {
             validated.minValue = 0.0;
             validated.maxValue = 1500.0;
         }
-        if (validated.enabledValue < validated.minValue || validated.enabledValue > validated.maxValue) {
-            validated.enabledValue = 1500.0;
+        if (validated.enabledValue < validated.minValue) {
+            validated.enabledValue = validated.minValue;
+        }
+        if (validated.enabledValue > validated.maxValue) {
+            validated.enabledValue = validated.maxValue;
         }
         if (isBlank(validated.toggleKey)) {
             validated.toggleKey = "key.keyboard.g";

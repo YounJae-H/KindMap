@@ -54,6 +54,28 @@ final class ConfigManagerTest {
     }
 
     @Test
+    void clampsGammaEnabledValueToValidatedRange() throws Exception {
+        Path file = tempDir.resolve("kindmap.json");
+        Files.writeString(file, """
+            {
+              "gamma": {
+                "enabledValue": 999.0,
+                "minValue": 0.0,
+                "maxValue": 100.0
+              },
+              "macros": []
+            }
+            """);
+        ConfigManager manager = new ConfigManager(file);
+
+        ModConfig config = manager.load();
+
+        assertEquals(0.0, config.gamma.minValue);
+        assertEquals(100.0, config.gamma.maxValue);
+        assertEquals(100.0, config.gamma.enabledValue);
+    }
+
+    @Test
     void defaultsMissingGammaFieldsInPartialJson() throws Exception {
         Path file = tempDir.resolve("kindmap.json");
         Files.writeString(file, """
