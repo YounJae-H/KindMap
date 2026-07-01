@@ -6,7 +6,7 @@
 
 **Architecture:** Create a small Fabric client project with separate config, gamma, macro, and UI packages. Keep gamma and macro logic testable through plain Java adapters, then wire them into Fabric client events and Mod Menu.
 
-**Tech Stack:** Java 25, Gradle 9.6.1 wrapper, Fabric Loom 1.17.13, Fabric Loader 0.19.3, Fabric API 0.154.0+26.1.2, Fabric intermediary v2 mappings, Mod Menu 18.0.0-beta.1, Gson, JUnit 5.
+**Tech Stack:** Java 25, Gradle 9.6.1 wrapper, Fabric Loom 1.17.13, Fabric Loader 0.19.3, Fabric API 0.152.1+26.1.2 or newer, Fabric intermediary v2 mappings, Mod Menu 18.0.0-beta.1, Gson, JUnit 5.
 
 **Implementation note:** Mojang official mapping downloads and matching Yarn mappings were not available for `26.1.2` during setup, so the working build uses `net.fabricmc:intermediary:0.0.0:v2`. Fabric API and Mod Menu are kept as plain compile/runtime classpath dependencies to avoid Loom source remap failures under this mapping set. Cloth Config was removed; settings are implemented with a custom vanilla `Screen`.
 
@@ -90,7 +90,7 @@ org.gradle.parallel=true
 
 minecraft_version=26.1.2
 loader_version=0.19.3
-fabric_version=0.154.0+26.1.2
+fabric_version=0.152.1+26.1.2
 loom_version=1.17.13
 
 mod_version=0.1.0
@@ -205,7 +205,7 @@ Create `src/main/resources/fabric.mod.json`:
   "depends": {
     "fabricloader": ">=0.19.3",
     "minecraft": "26.1.2",
-    "fabric-api": ">=0.154.0+26.1.2",
+    "fabric-api": ">=0.152.1+26.1.2",
     "java": ">=25"
   },
   "suggests": {

@@ -13,7 +13,7 @@ The mod should work in a Feather Client Fabric profile shown as `26.1.2-FB`, whi
 
 - Minecraft: `26.1.2`
 - Fabric Loader: `0.19.3`
-- Fabric API: `0.154.0+26.1.2`
+- Fabric API: `0.152.1+26.1.2` or newer
 - Mapping strategy: Fabric intermediary v2 mappings
 - Runtime side: client only
 - Optional UI integration:

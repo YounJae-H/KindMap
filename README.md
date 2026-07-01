@@ -21,7 +21,7 @@ Use Java 25.
 .\gradlew.bat build --no-daemon
 ```
 
-The mod jar is written under `build/libs/`. Use it with a Minecraft `26.1.2` Fabric profile or a Feather `26.1.2-FB` profile that has Fabric Loader and Fabric API available.
+The mod jar is written under `build/libs/`. Use it with a Minecraft `26.1.2` Fabric profile or a Feather `26.1.2-FB` profile that has Fabric Loader and Fabric API `0.152.1+26.1.2` or newer available.
 
 ## Settings
 
