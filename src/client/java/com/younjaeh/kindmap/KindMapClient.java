@@ -29,7 +29,7 @@ import java.util.Map;
 public final class KindMapClient implements ClientModInitializer {
     private static final String GAMMA_KEY_TRANSLATION = "key.kindmap.toggle_gamma";
     private static final KeyMapping.Category KEY_CATEGORY =
-            KeyMapping.Category.register(Identifier.withDefaultNamespace(ModConstants.MOD_ID));
+            KeyMapping.Category.register(Identifier.fromNamespaceAndPath(ModConstants.MOD_ID, "kindmap"));
 
     private static KindMapClient instance;
 

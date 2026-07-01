@@ -1,6 +1,7 @@
 {
   "key.categories.kindmap": "KindMap",
   "key.category.kindmap": "KindMap",
+  "key.category.kindmap.kindmap": "KindMap",
   "key.kindmap.toggle_gamma": "Toggle Gamma",
   "text.kindmap.title": "KindMap",
   "text.kindmap.gamma": "Gamma",
@@ -8,10 +9,18 @@
   "text.kindmap.gamma.enabled": "Gamma Enabled",
   "text.kindmap.gamma.enabled_value": "Enabled Gamma",
   "text.kindmap.add_macro": "Add Macro",
+  "text.kindmap.delete_macro": "Delete Macro",
+  "text.kindmap.no_macros": "No macros configured",
   "text.kindmap.edit_macro": "Edit Macro",
+  "text.kindmap.macro_selector": "Macro %s/%s: %s",
+  "text.kindmap.macro.enabled": "Macro Enabled",
   "text.kindmap.macro.name": "Name",
   "text.kindmap.macro.key": "Key",
+  "text.kindmap.macro.capture_key": "Capture Key",
+  "text.kindmap.macro.capture_waiting": "Press a key...",
   "text.kindmap.macro.content": "Content",
   "text.kindmap.macro.action": "Action",
-  "text.kindmap.macro.mode": "Mode"
+  "text.kindmap.macro.mode": "Mode",
+  "text.kindmap.macro.delay_ms": "Delay (ms)",
+  "text.kindmap.macro.interval_ms": "Interval (ms)"
 }
