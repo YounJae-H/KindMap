@@ -1,5 +1,6 @@
 {
   "key.categories.kindmap": "KindMap",
+  "key.category.kindmap": "KindMap",
   "key.kindmap.toggle_gamma": "Toggle Gamma",
   "text.kindmap.title": "KindMap",
   "text.kindmap.gamma": "Gamma",
