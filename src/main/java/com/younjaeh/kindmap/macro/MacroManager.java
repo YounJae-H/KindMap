@@ -21,6 +21,10 @@ public final class MacroManager {
         this.chatExecutor = Objects.requireNonNull(chatExecutor, "chatExecutor");
     }
 
+    /**
+     * Replaces the configured macro list and clears pending runtime state.
+     * Call this only when the config changes, not from per-tick client wiring.
+     */
     public void setMacros(List<MacroConfig> macros) {
         this.macros = List.copyOf(macros == null ? List.of() : macros);
         clearRuntimeState();
@@ -58,6 +62,14 @@ public final class MacroManager {
     }
 
     public void tick(long nowMs) {
+        tick(nowMs, false);
+    }
+
+    public void tick(long nowMs, boolean typingFocused) {
+        if (typingFocused) {
+            return;
+        }
+
         runDelayedMacros(nowMs);
         runToggledMacros(nowMs);
     }

@@ -40,13 +40,30 @@ final class MacroManagerTest {
         manager.setMacros(List.of(macro));
 
         manager.onKeyPressed(GRAVE, 1000L, false);
-        manager.tick(1249L);
+        manager.tick(1249L, false);
         assertEquals(List.of(), chatExecutor.events);
 
-        manager.tick(1250L);
+        manager.tick(1250L, false);
         assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
 
-        manager.tick(1500L);
+        manager.tick(1500L, false);
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+    }
+
+    @Test
+    void delayedMacroWaitsWhileTypingFocused() {
+        MacroConfig macro = macro("delayed-focus", MacroAction.SEND, MacroMode.DELAYED);
+        macro.delayMs = 250L;
+        manager.setMacros(List.of(macro));
+
+        manager.onKeyPressed(GRAVE, 1000L, false);
+        manager.tick(1250L, true);
+        assertEquals(List.of(), chatExecutor.events);
+
+        manager.tick(1300L, false);
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+
+        manager.tick(1500L, false);
         assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
     }
 
@@ -113,17 +130,37 @@ final class MacroManagerTest {
         manager.setMacros(List.of(macro));
 
         manager.onKeyPressed(GRAVE, 1000L, false);
-        manager.tick(1000L);
+        manager.tick(1000L, false);
         assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
 
-        manager.tick(1199L);
+        manager.tick(1199L, false);
         assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
 
-        manager.tick(1200L);
+        manager.tick(1200L, false);
         assertEquals(List.of("SEND:" + ENDER, "SEND:" + ENDER), chatExecutor.events);
 
         manager.onKeyPressed(GRAVE, 1500L, false);
-        manager.tick(1600L);
+        manager.tick(1600L, false);
+        assertEquals(List.of("SEND:" + ENDER, "SEND:" + ENDER), chatExecutor.events);
+    }
+
+    @Test
+    void toggleMacroWaitsWhileTypingFocused() {
+        MacroConfig macro = macro("toggle-focus", MacroAction.SEND, MacroMode.TOGGLE);
+        macro.intervalMs = 200L;
+        manager.setMacros(List.of(macro));
+
+        manager.onKeyPressed(GRAVE, 1000L, false);
+        manager.tick(1000L, true);
+        assertEquals(List.of(), chatExecutor.events);
+
+        manager.tick(1300L, false);
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+
+        manager.tick(1499L, false);
+        assertEquals(List.of("SEND:" + ENDER), chatExecutor.events);
+
+        manager.tick(1500L, false);
         assertEquals(List.of("SEND:" + ENDER, "SEND:" + ENDER), chatExecutor.events);
     }
 
@@ -138,8 +175,8 @@ final class MacroManagerTest {
         manager.onKeyPressed(GRAVE, 1000L, false);
         manager.onKeyPressed(GRAVE, 1000L, false);
         manager.setMacros(List.of(macro("replacement", MacroAction.SEND, MacroMode.SIMPLE)));
-        manager.tick(1250L);
-        manager.tick(1400L);
+        manager.tick(1250L, false);
+        manager.tick(1400L, false);
 
         assertEquals(List.of(), chatExecutor.events);
     }
